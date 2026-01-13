@@ -1,0 +1,68 @@
+﻿@model LibraryManagement.Models.Book
+@* Ten widok służy do edycji istniejącej już w bazie książki *@
+
+@{
+    ViewData["Title"] = "Edytuj Książkę";
+}
+
+<h1>Edytuj książkę</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit">
+            @* Wyświetlanie błędów walidacji modelu *@
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            @* KLUCZOWE: Ukryte pole przechowujące ID edytowanej książki. 
+               Bez tego serwer nie wiedziałby, który rekord zaktualizować! *@
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-group mb-3">
+                <label asp-for="Title" class="control-label">Tytuł</label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="AuthorId" class="control-label">Autor</label>
+                @* Lista rozwijana pozwalająca zmienić autora książki *@
+                <select asp-for="AuthorId" class="form-control"
+                        asp-items="@(new SelectList(ViewBag.Authors, "Id", "FullName"))">
+                    <option value="">-- Wybierz autora --</option>
+                </select>
+                <span asp-validation-for="AuthorId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="ISBN" class="control-label"></label>
+                <input asp-for="ISBN" class="form-control" />
+                <span asp-validation-for="ISBN" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="PageCount" class="control-label">Liczba stron</label>
+                <input asp-for="PageCount" class="form-control" />
+                <span asp-validation-for="PageCount" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="PublicationDate" class="control-label">Data publikacji</label>
+                <input asp-for="PublicationDate" type="date" class="form-control" />
+                <span asp-validation-for="PublicationDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Zapisz zmiany" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Anuluj</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @* Skrypty walidacji po stronie przeglądarki *@
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

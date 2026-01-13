@@ -1,0 +1,68 @@
+﻿@model LibraryManagement.Models.Book
+@* Definicja modelu: widok oczekuje konkretnego obiektu klasy Book do usunięcia *@
+
+@{
+    ViewData["Title"] = "Usuń książkę";
+    // Ustawienie tytułu strony dla układu głównego
+}
+
+<h1>Usuń książkę</h1>
+@* Nagłówek strony *@
+
+<h3>Czy na pewno chcesz usunąć tę książkę?</h3>
+@* Komunikat ostrzegawczy przed nieodwracalną akcją *@
+<div>
+    <hr />
+    <dl class="row">
+        @* Lista opisowa (dl) w systemie siatki Bootstrap (row) *@
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Title)
+            @* Wyświetla nazwę pola "Tytuł" pobraną z metadanych modelu *@
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Title)
+            @* Wyświetla rzeczywistą wartość tytułu książki *@
+        </dd>
+
+        <dt class="col-sm-2">
+            Autor
+            @* Ręczne tłumaczenie etykiety dla czytelności *@
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Author?.FullName
+            @* Wyświetlenie pełnego imienia i nazwiska autora (z bezpiecznym dostępem ?.) *@
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ISBN)
+            @* Wyświetla etykietę pola ISBN *@
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ISBN)
+            @* Wyświetla numer ISBN usuwanej książki *@
+        </dd>
+
+        <dt class="col-sm-2">
+            Liczba stron
+            @* Etykieta dla PageCount *@
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PageCount)
+            @* Wyświetla liczbę stron *@
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        @* Formularz, który po zatwierdzeniu wyśle żądanie POST do metody Delete w kontrolerze *@
+
+        <input type="hidden" asp-for="Id" />
+        @* Kluczowy element: ukryte pole z ID książki. Serwer musi wiedzieć, co usunąć, mimo że użytkownik tego nie widzi *@
+
+        <input type="submit" value="Usuń" class="btn btn-danger" />
+        @* Przycisk typu submit, btn-danger nadaje mu czerwony, ostrzegawczy kolor *@
+
+        <a asp-action="Index" class="btn btn-secondary">Anuluj</a>
+        @* Bezpieczny powrót do listy, jeśli użytkownik się rozmyśli *@
+    </form>
+</div>

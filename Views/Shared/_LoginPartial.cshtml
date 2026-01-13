@@ -1,26 +1,45 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@* Importowanie przestrzeni nazw odpowiedzialnej za system tożsamości (użytkownicy, role) *@
+
 @inject SignInManager<IdentityUser> SignInManager
+@* Wstrzykiwanie usługi zarządzającej procesem logowania (sprawdza czy użytkownik jest zalogowany) *@
+
 @inject UserManager<IdentityUser> UserManager
+@* Wstrzykiwanie usługi zarządzającej danymi użytkownika (np. pobieranie nazwy konta) *@
 
 <ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
-{
-    <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
-    </li>
-    <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-        </form>
-    </li>
-}
-else
-{
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
-}
+    @* Rozpoczęcie listy elementów nawigacyjnych dla sekcji logowania *@
+
+    @if (SignInManager.IsSignedIn(User))
+    // Instrukcja warunkowa: sprawdza, czy obecny użytkownik jest zalogowany
+    {
+        <li class="nav-item">
+            @* Element listy zawierający powitanie zalogowanego użytkownika *@
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Zarządzaj">Witaj @User.Identity?.Name!</a>
+            @* Link do profilu użytkownika; @User.Identity?.Name dynamicznie wstawia nazwę zalogowanej osoby *@
+        </li>
+        <li class="nav-item">
+            @* Element listy zawierający formularz wylogowania *@
+            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                @* Formularz przesyłający żądanie wylogowania; po wylogowaniu przekieruje na stronę główną *@
+                <button type="submit" class="nav-control btn btn-link text-dark">Wyloguj</button>
+                @* Przycisk stylizowany na link, który zatwierdza formularz i wylogowuje użytkownika *@
+            </form>
+        </li>
+    }
+    else
+    // Blok wykonywany, gdy użytkownik NIE jest zalogowany (gość)
+    {
+        <li class="nav-item">
+            @* Element listy zawierający link do rejestracji *@
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Zarejestruj</a>
+            @* Link kierujący do wbudowanej strony tworzenia nowego konta użytkownika *@
+        </li>
+        <li class="nav-item">
+            @* Element listy zawierający link do logowania *@
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Zaloguj</a>
+            @* Link kierujący do wbudowanej strony formularza logowania *@
+        </li>
+    }
 </ul>
+@* Koniec listy elementów nawigacyjnych *@

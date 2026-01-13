@@ -1,6 +1,33 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    // Ustawienie tytułu strony, który zostanie przekazany do układu głównego (_Layout)
+    ViewData["Title"] = "Polityka Prywatności";
 }
+
+@* Nagłówek strony pobierający tytuł z ViewData *@
 <h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+@* Niebieska ramka informacyjna (Bootstrap alert-info) *@
+<div class="alert alert-info mt-4">
+    @* mt-4 dodaje margines górny dla lepszego odstępu *@
+
+    <h4>Przetwarzanie danych w systemie System Biblioteczny</h4>
+    @* Nagłówek wewnątrz ramki informacyjnej *@
+
+    <p>Niniejsza strona służy celom edukacyjnym. W systemie przechowywane są następujące dane:</p>
+    @* Wyjaśnienie charakteru projektu (ważne w projektach studenckich) *@
+
+    <ul>
+        @* Lista punktowana opisująca zakres gromadzonych danych *@
+        <li><strong>Dane czytelników:</strong> Imię, nazwisko, adres e-mail oraz numer telefonu.</li>
+        @* Dane pochodzące z Twojego modelu 'Patron' *@
+
+        <li><strong>Dane logowania:</strong> Adres e-mail oraz zahashowane hasło (ASP.NET Core Identity).</li>
+        @* Informacja o technologii Identity, która bezpiecznie przechowuje hasła *@
+    </ul>
+
+    <hr>
+    @* Linia pozioma oddzielająca sekcje *@
+
+    <p class="mb-0">Dane są wykorzystywane wyłącznie do prezentacji funkcjonalności wzorca MVC oraz autoryzacji użytkowników zgodnie ze specyfikacją projektu.</p>
+    @* mb-0 usuwa dolny margines akapitu, aby ramka była zgrabniejsza *@
+</div>

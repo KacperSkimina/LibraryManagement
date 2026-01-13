@@ -1,0 +1,61 @@
+﻿@model LibraryManagement.Models.Patron
+@* Model Patron przechowuje dane kontaktowe osoby wypożyczającej książki *@
+
+@{
+    ViewData["Title"] = "Dodaj Czytelnika";
+    // Tytuł strony wyświetlany w karcie przeglądarki
+}
+
+<h1>Dodaj nowego czytelnika</h1>
+
+<hr />
+<div class="row">
+    @* Formularz zajmujący połowę szerokości strony (6/12 kolumn Bootstrap) *@
+    <div class="col-md-6">
+        <form asp-action="Create">
+            @* Walidacja zbiorcza dla modelu *@
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="FirstName" class="control-label">Imię</label>
+                <input asp-for="FirstName" class="form-control" />
+                @* Walidacja po stronie klienta dla pola Imię *@
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="LastName" class="control-label">Nazwisko</label>
+                <input asp-for="LastName" class="form-control" />
+                @* Walidacja po stronie klienta dla pola Nazwisko *@
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Email" class="control-label">E-mail</label>
+                <input asp-for="Email" type="email" class="form-control" />
+                @* Pole typu 'email' zapewnia podstawową walidację formatu adresu w przeglądarce *@
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="PhoneNumber" class="control-label">Numer telefonu</label>
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                @* Przycisk wysyłający formularz (POST) *@
+                <input type="submit" value="Dodaj czytelnika" class="btn btn-primary" />
+                @* Powrót do listy czytelników *@
+                <a asp-action="Index" class="btn btn-secondary">Anuluj</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @* Załadowanie skryptów walidacji jQuery, aby błędy pojawiały się bez odświeżania strony *@
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

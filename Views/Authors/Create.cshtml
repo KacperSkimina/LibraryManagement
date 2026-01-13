@@ -1,0 +1,82 @@
+﻿@model LibraryManagement.Models.Author
+@* Określenie silnego typu modelu - ten widok pracuje na obiekcie klasy Author *@
+
+@{
+    ViewData["Title"] = "Dodaj Autora";
+    // Przypisanie tytułu strony, który zostanie wyświetlony w nagłówku przeglądarki
+}
+
+<h1>Dodaj nowego autora</h1>
+@* Nagłówek widoczny na górze strony *@
+
+<hr />
+@* Linia pozioma oddzielająca nagłówek od formularza *@
+<div class="row">
+    @* Bootstrapowy system siatki: otwarcie rzędu *@
+    <div class="col-md-6">
+        @* Formularz zajmie 6 z 12 dostępnych kolumn (połowę szerokości) *@
+        <form asp-action="Create">
+            @* Tag Helper definiujący, że po wysłaniu dane trafią do metody POST Create w kontrolerze *@
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @* Kontener na ogólne błędy walidacji (np. błąd bazy danych) wyświetlany na czerwono *@
+
+            <div class="form-group mb-3">
+                @* Grupa formularza z dolnym marginesem dla zachowania odstępów *@
+                <label asp-for="FirstName" class="control-label">Imię</label>
+                @* Etykieta powiązana z polem FirstName w modelu danych *@
+                <input asp-for="FirstName" class="form-control" />
+                @* Pole tekstowe, w którym użytkownik wpisuje imię autora *@
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+                @* Miejsce na komunikat błędu, jeśli imię nie przejdzie walidacji *@
+            </div>
+
+            <div class="form-group mb-3">
+                @* Grupa formularza dla nazwiska *@
+                <label asp-for="LastName" class="control-label">Nazwisko</label>
+                @* Etykieta powiązana z polem LastName *@
+                <input asp-for="LastName" class="form-control" />
+                @* Pole tekstowe dla nazwiska autora *@
+                <span asp-validation-for="LastName" class="text-danger"></span>
+                @* Wyświetla błąd walidacji dla nazwiska *@
+            </div>
+
+            <div class="form-group mb-3">
+                @* Grupa formularza dla daty urodzenia *@
+                <label asp-for="BirthDate" class="control-label">Data urodzenia</label>
+                @* Etykieta dla pola BirthDate *@
+                <input asp-for="BirthDate" type="date" class="form-control" />
+                @* Pole typu 'date' – przeglądarka automatycznie wyświetli tu kalendarz *@
+                <span asp-validation-for="BirthDate" class="text-danger"></span>
+                @* Wyświetla błąd walidacji daty *@
+            </div>
+
+            <div class="form-group mb-3">
+                @* Grupa formularza dla biografii autora *@
+                <label asp-for="Biography" class="control-label">Biografia</label>
+                @* Etykieta dla pola Biography *@
+                <textarea asp-for="Biography" class="form-control" rows="4"></textarea>
+                @* Wielolinijkowe pole tekstowe (textarea) o wysokości 4 wierszy *@
+                <span asp-validation-for="Biography" class="text-danger"></span>
+                @* Wyświetla błąd walidacji biografii *@
+            </div>
+
+            <div class="form-group">
+                @* Grupa przycisków akcji *@
+                <input type="submit" value="Dodaj autora" class="btn btn-primary" />
+                @* Przycisk wysyłający dane z formularza do serwera *@
+                <a asp-action="Index" class="btn btn-secondary">Anuluj</a>
+                @* Link powrotny do listy autorów, stylizowany na szary przycisk *@
+            </div>
+        </form>
+        @* Zamknięcie znacznika formularza *@
+    </div>
+</div>
+
+@section Scripts {
+    @* Sekcja, która wstrzykuje skrypty na końcu pliku _Layout *@
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        @* Wczytanie skryptów jQuery do walidacji po stronie przeglądarki (bez przeładowania strony) *@
+    }
+}

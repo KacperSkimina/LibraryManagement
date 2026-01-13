@@ -1,0 +1,91 @@
+﻿@model List<LibraryManagement.Models.Author>
+@* Definicja modelu: widok przyjmuje listę obiektów klasy Author *@
+
+@{
+    ViewData["Title"] = "Autorzy";
+    // Ustawienie tytułu strony dla układu _Layout
+}
+
+<h1>Autorzy</h1>
+@* Nagłówek główny strony *@
+
+@if (User.IsInRole("Administrator"))
+// Sprawdzenie uprawnień: tylko zalogowany Administrator widzi przycisk dodawania
+{
+    <p>
+        <a asp-action="Create" class="btn btn-success">Dodaj nowego autora</a>
+        @* Przycisk kierujący do formularza tworzenia nowego autora *@
+    </p>
+}
+
+@if (Model.Count == 0)
+// Sprawdzenie czy lista przekazana z kontrolera jest pusta
+{
+    <p>Brak dostępnych autorów w bazie.</p>
+}
+else
+// Jeśli autorzy istnieją, generujemy tabelę z danymi
+{
+    <table class="table table-striped">
+        @* table-striped: klasa Bootstrapa dodająca paski w tabeli dla czytelności *@
+        <thead>
+            <tr>
+                <th>Autor</th> @* Nagłówek kolumny z imieniem i nazwiskiem *@
+                <th>Data urodzenia</th> @* Nagłówek kolumny z datą *@
+                <th>Liczba książek</th> @* Nagłówek kolumny z licznikiem *@
+                <th>Tytuły książek</th> @* Nagłówek kolumny z listą tytułów *@
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var author in Model)
+            // Pętla iterująca przez każdego autora na liście
+            {
+                <tr>
+                    <td>@author.FullName</td>
+                    @* Wyświetlenie pełnego imienia i nazwiska (właściwość obliczana w modelu) *@
+                    <td>@author.BirthDate?.ToString("yyyy-MM-dd")</td>
+                    @* Wyświetlenie daty w formacie RRRR-MM-DD (użycie ? zapewnia bezpieczeństwo przy null) *@
+                    <td>
+                        <span class="badge @(author.Books?.Count > 0 ? "bg-primary" : "bg-secondary")">
+                            @* Dynamiczna klasa koloru: niebieski jeśli ma książki, szary jeśli nie *@
+                            @author.Books?.Count książek
+                            @* Wykorzystanie właściwości nawigacyjnej do zliczenia książek autora *@
+                        </span>
+                    </td>
+                    <td>
+                        @{
+                            // Logika pomocnicza: pobranie listy książek lub stworzenie pustej jeśli brak
+                            var authorBooks = author.Books?.ToList() ?? new List<Book>();
+                        }
+                        @if (authorBooks.Any())
+                        // Jeśli autor ma przypisane jakieś książki
+                        {
+                            <ul class="list-unstyled mb-0">
+                                @* list-unstyled: usuwa kropki przy liście wypunktowanej *@
+                                @foreach (var book in authorBooks.Take(3))
+                                // Pobranie maksymalnie 3 pierwszych tytułów (żeby tabela nie była za długa)
+                                {
+                                    <li>📚 @book?.Title</li>
+                                }
+                                @if (authorBooks.Count > 3)
+                                // Jeśli książek jest więcej niż 3, wyświetlamy informację o reszcie
+                                {
+                                    <li class="text-muted">... i @(authorBooks.Count - 3) więcej</li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Brak książek</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Powrót do strony głównej</a>
+    @* Przycisk powrotu do dashboardu *@
+</div>

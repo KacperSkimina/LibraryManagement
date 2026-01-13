@@ -1,0 +1,74 @@
+﻿@model List<LibraryManagement.Models.Borrow>
+@* Widok przyjmuje listę obiektów wypożyczeń z bazy danych *@
+
+@{
+    ViewData["Title"] = "Wypożyczenia";
+    // Ustawienie tytułu widoku
+}
+
+<h1>Lista wypożyczeń</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Nowe wypożyczenie</a>
+    @* Przycisk otwierający formularz nowego wypożyczenia *@
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Książka</th> @* Wyświetla tytuł z relacji *@
+            <th>Czytelnik</th> @* Wyświetla imię i nazwisko z relacji *@
+            <th>Data wypożyczenia</th>
+            <th>Termin zwrotu</th>
+            <th>Data zwrotu</th>
+            <th>Status</th>
+            <th>Akcje</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var borrow in Model)
+        // Pętla przechodząca przez każde wypożyczenie w systemie
+        {
+            <tr>
+                <td>@borrow.Book?.Title</td>
+                @* Dostęp do tytułu książki przez właściwość nawigacyjną (Navigation Property) *@
+                <td>@borrow.Patron?.FirstName @borrow.Patron?.LastName</td>
+                @* Wyświetlenie pełnych danych czytelnika *@
+                <td>@borrow.BorrowDate.ToString("yyyy-MM-dd")</td>
+                @* Formatowanie daty do czytelnego formatu RRRR-MM-DD *@
+                <td>@borrow.DueDate.ToString("yyyy-MM-dd")</td>
+                <td>@(borrow.ReturnDate?.ToString("yyyy-MM-dd") ?? "-")</td>
+                @* Jeśli książka nie została oddana (null), wyświetlamy kreskę *@
+                <td>
+                    @* Logika wyświetlania kolorowych statusów (Badge) *@
+                    @if (borrow.IsReturned)
+                    {
+                        <span class="badge bg-success">Oddano</span>
+                        @* Zielony status dla zakończonych wypożyczeń *@
+                    }
+                    else if (borrow.DueDate < DateTime.Now)
+                    {
+                        <span class="badge bg-danger">Zaległe</span>
+                        @* Czerwony status, jeśli minął termin zwrotu, a książki nie oddano *@
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">W toku</span>
+                        @* Żółty status dla aktywnych, nieprzeterminowanych wypożyczeń *@
+                    }
+                </td>
+                <td>
+                    @if (!borrow.IsReturned)
+                    // Przycisk "Zwróć" pojawia się tylko, jeśli książka jest jeszcze u czytelnika
+                    {
+                        <a asp-action="Return" asp-route-id="@borrow.Id" class="btn btn-sm btn-info">Zwróć</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Powrót do strony głównej</a>
+</div>

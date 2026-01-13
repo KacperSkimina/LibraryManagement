@@ -1,20 +1,26 @@
-using System.Diagnostics;
-using LibraryManagement.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using LibraryManagement.Data;
+using System.Threading.Tasks;
 
 namespace LibraryManagement.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ApplicationDbContext context)
         {
-            _logger = logger;
+            _context = context;
         }
 
         public IActionResult Index()
         {
+            ViewBag.BooksCount = _context.Books.Count();
+            ViewBag.AuthorsCount = _context.Authors.Count();
+            ViewBag.ActiveBorrowsCount = _context.Borrows.Count(b => b.ReturnDate == null);
+            ViewBag.PatronsCount = _context.Patrons.Count();
+
             return View();
         }
 
@@ -23,10 +29,9 @@ namespace LibraryManagement.Controllers
             return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public IActionResult ApiTest()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View();
         }
     }
 }

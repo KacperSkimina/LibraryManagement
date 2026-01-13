@@ -1,8 +1,107 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "System Zarządzania Biblioteką";
+    // Ustawienie tytułu strony głównej w meta-danych widoku
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    @* Klasa Bootstrapowa centrująca cały tekst wewnątrz kontenera *@
+    <h1 class="display-4">Witaj w Systemie Bibliotecznym</h1>
+    @* display-4 tworzy duży, czytelny nagłówek powitalny *@
+
+    <div class="row mt-5">
+        @* mt-5 dodaje spory margines górny (margin-top), aby odsunąć karty od nagłówka *@
+        <div class="col-md-4 mb-4">
+            @* Karta zajmuje 4 z 12 kolumn (1/3 szerokości) na średnich ekranach *@
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">📚 Książki</h5>
+                    <p class="card-text">Przeglądaj naszą kolekcję, szukaj tytułów i sprawdzaj szczegóły.</p>
+                    <a href="/Books" class="btn btn-primary">Zobacz Książki</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            @* Druga karta nawigacyjna - Autorzy *@
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">👥 Autorzy</h5>
+                    <p class="card-text">Poznaj autorów i ich dzieła dostępne w naszej bibliotece.</p>
+                    <a href="/Authors" class="btn btn-primary">Zobacz Autorów</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            @* Trzecia karta nawigacyjna - Wypożyczenia *@
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">📖 Wypożyczenia</h5>
+                    <p class="card-text">Zarządzaj wypożyczeniami, zwrotami i terminami oddania książek.</p>
+                    <a href="/Borrows" class="btn btn-primary">Zobacz Wypożyczenia</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-6 offset-md-3">
+            @* Karta statystyk wycentrowana dzięki offset-md-3 (przesunięcie o 3 kolumny) *@
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">🏆 Szybkie statystyki</h5>
+                    <div class="row text-center">
+                        <div class="col">
+                            <h3>@ViewBag.BooksCount</h3>
+                            @* Wyświetlenie liczby książek przekazanej z kontrolera przez ViewBag *@
+                            <p class="text-muted">Książki</p>
+                        </div>
+                        <div class="col">
+                            <h3>@ViewBag.AuthorsCount</h3>
+                            @* Wyświetlenie liczby autorów *@
+                            <p class="text-muted">Autorzy</p>
+                        </div>
+                        <div class="col">
+                            <h3>@ViewBag.ActiveBorrowsCount</h3>
+                            @* Wyświetlenie liczby aktywnych wypożyczeń *@
+                            <p class="text-muted">Aktywne</p>
+                        </div>
+                        <div class="col">
+                            <h3>@ViewBag.PatronsCount</h3>
+                           @*  Wyświetlenie liczby zarejestrowanych czytelników *@
+                            <p class="text-muted">Czytelnicy</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    // Sprawdzenie, czy użytkownik jest zalogowany
+    {
+        <div class="mt-4 alert alert-success">
+            @* Wyświetlenie zielonego paska z powitaniem dla zalogowanego *@
+            <h5>Witaj, @User.Identity.Name!</h5>
+            <p>
+                Jesteś zalogowany jako:
+                @if (User.IsInRole("Administrator"))
+                // Dynamiczne wyświetlanie rangi użytkownika (Administrator / Użytkownik)
+                {
+                    <span class="badge bg-danger">Administrator</span>
+                }
+                else
+                {
+                    <span class="badge bg-info">Użytkownik</span>
+                }
+            </p>
+        </div>
+    }
+    else
+    // Komunikat wyświetlany tylko dla gości
+    {
+        <div class="mt-4">
+            <p>Proszę się <a href="/Identity/Account/Login">zalogować</a>, aby uzyskać dostęp do wszystkich funkcji.</p>
+        </div>
+    }
 </div>

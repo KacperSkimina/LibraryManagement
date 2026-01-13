@@ -20,3 +20,23 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.card {
+    transition: transform 0.3s;
+    height: 100%;
+}
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+.display-4 {
+    color: #2c3e50;
+    font-weight: 300;
+}
+
+.badge {
+    font-size: 0.8em;
+    padding: 5px 10px;
+}

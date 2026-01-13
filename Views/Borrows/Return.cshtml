@@ -1,0 +1,49 @@
+﻿@model LibraryManagement.Models.Borrow
+@* Model Borrow zawiera szczegóły dotyczące konkretnej operacji wypożyczenia *@
+
+@{
+    ViewData["Title"] = "Zwrot książki";
+    // Ustawienie tytułu strony w meta-danych
+}
+
+<h1>Zwrot książki</h1>
+
+<h3>Czy na pewno chcesz oznaczyć tę książkę jako zwróconą?</h3>
+@* Komunikat potwierdzający akcję *@
+<div>
+    <hr />
+    <dl class="row">
+        @* Lista opisowa z danymi o wypożyczeniu *@
+        <dt class="col-sm-2">Książka</dt>
+        <dd class="col-sm-10">@Model.Book?.Title</dd>
+        @* Wyświetlenie tytułu książki (dzięki relacji BookId -> Book) *@
+
+        <dt class="col-sm-2">Czytelnik</dt>
+        <dd class="col-sm-10">@Model.Patron?.FirstName @Model.Patron?.LastName</dd>
+        @* Wyświetlenie danych osoby, która posiada książkę *@
+
+        <dt class="col-sm-2">Data wypożyczenia</dt>
+        <dd class="col-sm-10">@Model.BorrowDate.ToString("yyyy-MM-dd")</dd>
+        @* Formatowanie daty wypożyczenia *@
+
+        <dt class="col-sm-2">Termin zwrotu</dt>
+        <dd class="col-sm-10">@Model.DueDate.ToString("yyyy-MM-dd")</dd>
+        @* Wyświetlenie planowanego terminu oddania *@
+
+        <dt class="col-sm-2">Dni u czytelnika</dt>
+        <dd class="col-sm-10">@((DateTime.Now - Model.BorrowDate).Days) dni</dd>
+        @* Dynamiczne obliczenie różnicy czasu: czas obecny minus data wypożyczenia *@
+    </dl>
+
+    <form asp-action="Return">
+        @* Formularz przesyłający potwierdzenie zwrotu metodą POST *@
+        <input type="hidden" asp-for="Id" />
+        @* Ukryte pole z ID wypożyczenia – kluczowe do zlokalizowania rekordu w bazie *@
+
+        <input type="submit" value="Potwierdź zwrot" class="btn btn-success" />
+        @* Przycisk potwierdzający (zielony) – kolor sugeruje pozytywną akcję *@
+
+        <a asp-action="Index" class="btn btn-secondary">Anuluj</a>
+        @* Przycisk powrotu do listy *@
+    </form>
+</div>

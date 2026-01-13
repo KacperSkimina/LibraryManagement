@@ -1,0 +1,89 @@
+﻿@model List<LibraryManagement.Models.Patron>
+@* Widok przyjmuje listę wszystkich czytelników z bazy *@
+
+@{
+    ViewData["Title"] = "Czytelnicy";
+}
+
+<h1>Lista czytelników</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Dodaj nowego czytelnika</a>
+</p>
+
+@if (Model.Count == 0)
+{
+    <p>Brak czytelników w bazie danych.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Imię i nazwisko</th>
+                <th>E-mail</th>
+                <th>Telefon</th>
+                <th>Statystyki</th>
+                <th>Aktualnie wypożyczone</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var patron in Model)
+            {
+                <tr>
+                    <td>
+                        <strong>@patron.FullName</strong>
+                    </td>
+                    <td>@patron.Email</td>
+                    <td>@patron.PhoneNumber</td>
+                    <td>
+                        @* Sekcja statystyk z kolorowymi etykietami (Badges) *@
+                        <div>
+                            <span class="badge bg-info">Suma: @patron.Borrows?.Count</span>
+                        </div>
+                        <div>
+                            <span class="badge bg-warning text-dark">W toku: @patron.Borrows?.Count(b => !b.IsReturned)</span>
+                        </div>
+                        <div>
+                            <span class="badge bg-success">Zwrócone: @patron.Borrows?.Count(b => b.IsReturned)</span>
+                        </div>
+                    </td>
+                    <td>
+                        @* Sprawdzenie, czy czytelnik ma jakiekolwiek aktywne wypożyczenia *@
+                        @if (patron.Borrows?.Any(b => !b.IsReturned) == true)
+                        {
+                            <ul class="list-unstyled">
+                                @foreach (var borrow in patron.Borrows.Where(b => !b.IsReturned))
+                                {
+                                    <li class="mb-2">
+                                        📖 <strong>@borrow.Book?.Title</strong>
+                                        <br />
+                                        <small class="text-muted">
+                                            Autor: @borrow.Book?.Author?.FullName
+                                            <br />
+                                            Termin: @borrow.DueDate.ToString("yyyy-MM-dd")
+
+                                            @* Logika ostrzegania o przeterminowaniu *@
+                                            @if (borrow.DueDate < DateTime.Now)
+                                            {
+                                                <span class="badge bg-danger pulse-animation">PO TERMINIE!</span>
+                                            }
+                                        </small>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Brak aktywnych wypożyczeń</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Powrót do strony głównej</a>
+</div>

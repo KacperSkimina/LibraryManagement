@@ -1,0 +1,85 @@
+@model LibraryManagement.Models.Book
+@* Okreœlenie typu modelu, który bêdzie tworzony przez ten formularz *@
+
+@{
+    ViewData["Title"] = "Dodaj now¹ ksi¹¿kê";
+    // Ustawienie tytu³u widoku
+}
+
+<h1>Dodaj now¹ ksi¹¿kê</h1>
+@* G³ówny nag³ówek formularza *@
+
+<hr />
+<div class="row">
+    @* Bootstrapowy system siatki - formularz zajmie 6 z 12 kolumn na œrednich ekranach *@
+    <div class="col-md-6">
+        <form asp-action="Create">
+            @* Tag Helper definiuj¹cy, ¿e po klikniêciu 'Wyœlij', dane trafi¹ do metody Create w kontrolerze *@
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @* Wyœwietla ogólne b³êdy walidacji, które nie s¹ przypisane do konkretnego pola *@
+
+            <div class="form-group mb-3">
+                <label asp-for="Title" class="control-label">Tytu³</label>
+                @* Etykieta powi¹zana z polem Title w modelu *@
+                <input asp-for="Title" class="form-control" />
+                @* Pole tekstowe powi¹zane z w³aœciwoœci¹ Title *@
+                <span asp-validation-for="Title" class="text-danger"></span>
+                @* Miejsce na wyœwietlenie komunikatu o b³êdzie, np. "Tytu³ jest wymagany" *@
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="ISBN" class="control-label">Numer ISBN</label>
+                @* Etykieta dla pola ISBN *@
+                <input asp-for="ISBN" class="form-control" />
+                @* Pole tekstowe dla ISBN *@
+                <span asp-validation-for="ISBN" class="text-danger"></span>
+                @* Wyœwietli b³¹d, jeœli np. wpisano mniej ni¿ 13 cyfr *@
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="PageCount" class="control-label">Liczba stron</label>
+                @* Etykieta dla pola PageCount *@
+                <input asp-for="PageCount" class="form-control" />
+                @* Pole typu numerycznego dla liczby stron *@
+                <span asp-validation-for="PageCount" class="text-danger"></span>
+                @* Walidacja sprawdzaj¹ca czy liczba jest wiêksza od 0 *@
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="PublicationDate" class="control-label">Data publikacji</label>
+                @* Etykieta dla daty publikacji *@
+                <input asp-for="PublicationDate" type="date" class="form-control" />
+                @* Pole typu 'date' wywo³uj¹ce systemowy kalendarz w przegl¹darce *@
+                <span asp-validation-for="PublicationDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="AuthorId" class="control-label">Autor</label>
+                @* Etykieta dla wyboru autora *@
+                <select asp-for="AuthorId" class="form-control"
+                        asp-items="@(new SelectList(ViewBag.Authors, "Id", "FullName"))">
+                    @* Lista rozwijana pobieraj¹ca dane z ViewBag.Authors (Id jako wartoœæ, FullName jako tekst) *@
+                    <option value="">-- Wybierz autora --</option>
+                    @* Domyœlna pusta opcja na liœcie *@
+                </select>
+                <span asp-validation-for="AuthorId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Dodaj ksi¹¿kê" class="btn btn-primary" />
+                @* Przycisk zatwierdzaj¹cy i wysy³aj¹cy formularz (POST) *@
+                <a asp-action="Index" class="btn btn-secondary">Anuluj</a>
+                @* Przycisk powrotu do listy ksi¹¿ek *@
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @* Sekcja na skrypty JavaScript ³adowane tylko na tej podstronie *@
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        @* Wczytanie skryptów jQuery Validation do walidacji w czasie rzeczywistym bez prze³adowania strony *@
+    }
+}

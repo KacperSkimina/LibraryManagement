@@ -1,0 +1,57 @@
+﻿@model LibraryManagement.Models.Borrow
+@* Model Borrow reprezentuje rekord łączący książkę z czytelnikiem *@
+
+@{
+    ViewData["Title"] = "Nowe wypożyczenie";
+    // Tytuł strony wyświetlany w przeglądarce
+}
+
+<h1>Nowe wypożyczenie</h1>
+
+<hr />
+<div class="row">
+    @* Formularz zajmujący 6 z 12 kolumn na średnich ekranach *@
+    <div class="col-md-6">
+        <form asp-action="Create">
+            @* Walidacja ogólna modelu *@
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="BookId" class="control-label">Książka</label>
+                @* Lista rozwijana z książkami: Id to wartość w bazie, Title to tekst dla użytkownika *@
+                <select asp-for="BookId" class="form-control" asp-items="@(new SelectList(ViewBag.Books, "Id", "Title"))">
+                    <option value="">-- Wybierz książkę --</option>
+                </select>
+                <span asp-validation-for="BookId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="PatronId" class="control-label">Czytelnik</label>
+                @* Lista rozwijana z czytelnikami: Id to wartość, LastName to tekst wyświetlany *@
+                <select asp-for="PatronId" class="form-control" asp-items="@(new SelectList(ViewBag.Patrons, "Id", "LastName"))">
+                    <option value="">-- Wybierz czytelnika --</option>
+                </select>
+                <span asp-validation-for="PatronId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="DueDate" class="control-label">Termin zwrotu</label>
+                @* Pole daty z domyślną wartością przesłaną z kontrolera przez ViewBag *@
+                <input asp-for="DueDate" type="date" value="@ViewBag.DueDate" class="form-control" />
+                <span asp-validation-for="DueDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Wypożycz" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Anuluj</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @* Skrypty do walidacji formularza po stronie klienta (JavaScript) *@
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

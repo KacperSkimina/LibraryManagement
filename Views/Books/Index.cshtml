@@ -1,0 +1,90 @@
+@model List<LibraryManagement.Models.Book>
+@* Definicja modelu: widok oczekuje listy obiektów typu Book *@
+
+@{
+    ViewData["Title"] = "Ksi¹¿ki";
+    // Ustawienie tytu³u strony, który zostanie wyœwietlony w zak³adce przegl¹darki
+}
+
+<h1>Ksi¹¿ki w bibliotece</h1>
+@* G³ówny nag³ówek strony *@
+
+@if (User.IsInRole("Administrator"))
+// Sprawdzenie, czy zalogowany u¿ytkownik posiada rolê Administratora
+{
+    <p>
+        <a asp-action="Create" class="btn btn-success mb-3">Dodaj now¹ ksi¹¿kê</a>
+        @* Przycisk widoczny tylko dla admina, prowadzi do formularza dodawania *@
+    </p>
+}
+
+<div class="alert alert-info">
+    Liczba ksi¹¿ek w systemie: @Model.Count
+</div>
+
+@if (Model.Count == 0)
+// Jeœli lista ksi¹¿ek jest pusta, wyœwietlamy ostrze¿enie
+{
+    <div class="alert alert-warning">
+        <p>Brak dostêpnych ksi¹¿ek. <a asp-action="Create">Dodaj pierwsz¹ ksi¹¿kê!</a></p>
+    </div>
+}
+else
+// Jeœli w bazie s¹ ksi¹¿ki, generujemy tabelê
+{
+    <table class="table table-striped">
+        @* table-striped dodaje naprzemienne kolory wierszy dla lepszej czytelnoœci *@
+        <thead>
+            <tr>
+                <th>ID</th> @* Identyfikator techniczny *@
+                <th>Tytu³</th>
+                <th>Autor</th>
+                <th>ISBN</th>
+                <th>Strony</th>
+                <th>Data publikacji</th>
+                <th>Akcje</th> @* Kolumna z przyciskami operacji *@
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var book in Model)
+            // Pêtla przechodz¹ca przez ka¿d¹ ksi¹¿kê przekazan¹ z kontrolera
+            {
+                <tr>
+                    <td>@book.Id</td>
+                    <td>@book.Title</td>
+                    <td>
+                        @if (book.Author != null)
+                        // Zabezpieczenie przed b³êdem, jeœli ksi¹¿ka nie ma przypisanego autora
+                        {
+                            @book.Author.FullName
+                        }
+                        else
+                        {
+                            <span class="text-danger">Brak autora</span>
+                        }
+                    </td>
+                    <td>@book.ISBN</td>
+                    <td>@book.PageCount</td>
+                    <td>@book.PublicationDate.ToString("yyyy-MM-dd")</td>
+                    @* Formatowanie daty do czytelnej postaci RRRR-MM-DD *@
+                    <td>
+                        <a asp-action="Details" asp-route-id="@book.Id" class="btn btn-info btn-sm">Szczegó³y</a>
+                        @* asp-route-id przekazuje ID konkretnej ksi¹¿ki do akcji w kontrolerze *@
+
+                        @if (User.IsInRole("Administrator"))
+                        // Dodatkowe przyciski edycji i usuwania tylko dla administratora
+                        {
+                            <a asp-action="Edit" asp-route-id="@book.Id" class="btn btn-warning btn-sm">Edytuj</a>
+                            <a asp-action="Delete" asp-route-id="@book.Id" class="btn btn-danger btn-sm">Usuñ</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Powrót do strony g³ównej</a>
+    @* Przycisk powrotu do g³ównego pulpitu aplikacji *@
+</div>
