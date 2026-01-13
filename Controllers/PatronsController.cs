@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using LibraryManagement.Data;
+﻿using LibraryManagement.Data;
 using LibraryManagement.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace LibraryManagement.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     public class PatronsController : Controller
     {
         private readonly ApplicationDbContext _context;

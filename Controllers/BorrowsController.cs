@@ -5,9 +5,11 @@ using LibraryManagement.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibraryManagement.Controllers
 {
+    [Authorize]
     public class BorrowsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -18,38 +20,53 @@ namespace LibraryManagement.Controllers
         }
 
         // GET: Borrows
+        // Admin widzi wszystkich, klient tylko swoje wypożyczenia
         public async Task<IActionResult> Index()
         {
-            var borrows = await _context.Borrows
-                .Include(b => b.Book)
-                    .ThenInclude(book => book.Author)
+            var query = _context.Borrows
+                .Include(b => b.Book).ThenInclude(book => book.Author)
                 .Include(b => b.Patron)
-                .OrderByDescending(b => b.BorrowDate)
-                .ToListAsync();
+                .AsQueryable();
 
-            // DEBUG
-            foreach (var borrow in borrows)
+            if (!User.IsInRole("Administrator"))
             {
-                Console.WriteLine($"Borrow #{borrow.Id}: Book: {borrow.Book?.Title}, Patron: {borrow.Patron?.FullName}");
+                var userEmail = User.Identity.Name;
+                query = query.Where(b => b.Patron.Email == userEmail);
             }
 
+            var borrows = await query.OrderByDescending(b => b.BorrowDate).ToListAsync();
             return View(borrows);
         }
 
         // GET: Borrows/Create
         public async Task<IActionResult> Create()
         {
-            // Pobierz dostępne książki (nie wypożyczone)
             var availableBooks = await _context.Books
                 .Where(b => b.Borrows.All(br => br.ReturnDate != null) || !b.Borrows.Any())
-                .Include(b => b.Author)
-                .ToListAsync();
+                .Include(b => b.Author).ToListAsync();
 
-            var patrons = await _context.Patrons.ToListAsync();
+            List<Patron> patrons;
+
+            if (User.IsInRole("Administrator"))
+            {
+                patrons = await _context.Patrons.ToListAsync();
+            }
+            else
+            {
+                var userEmail = User.Identity.Name;
+                patrons = await _context.Patrons.Where(p => p.Email == userEmail).ToListAsync();
+
+                // ZABEZPIECZENIE: Jeśli klient nie ma profilu Patron o tym samym mailu
+                if (!patrons.Any())
+                {
+                    // Używamy TempData do wyświetlenia komunikatu (upewnij się, że masz to w widoku lub Home)
+                    return Content("Błąd: Twoje konto nie jest powiązane z profilem Czytelnika. Poproś Admina o dodanie Twojego maila w zakładce Czytelnicy.");
+                }
+            }
 
             ViewBag.Books = availableBooks;
             ViewBag.Patrons = patrons;
-            ViewBag.DueDate = DateTime.Now.AddDays(14).ToString("yyyy-MM-dd"); // Domyślnie 2 tygodnie
+            ViewBag.DueDate = DateTime.Now.AddDays(14).ToString("yyyy-MM-dd");
 
             return View();
         }
@@ -59,69 +76,38 @@ namespace LibraryManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Borrow borrow)
         {
-            // DEBUG: Sprawdź co przychodzi
-            Console.WriteLine($"BookId: {borrow.BookId}");
-            Console.WriteLine($"PatronId: {borrow.PatronId}");
-            Console.WriteLine($"DueDate: {borrow.DueDate}");
-            Console.WriteLine($"ModelState.IsValid: {ModelState.IsValid}");
-
-            // Ustaw datę wypożyczenia
             borrow.BorrowDate = DateTime.Now;
 
-            // Walidacja
             if (borrow.DueDate <= borrow.BorrowDate)
-            {
-                ModelState.AddModelError("DueDate", "Due date must be after today");
-            }
+                ModelState.AddModelError("DueDate", "Data zwrotu musi być w przyszłości.");
 
-            // Sprawdź czy książka jest dostępna
             var isBookAvailable = !await _context.Borrows
                 .AnyAsync(b => b.BookId == borrow.BookId && b.ReturnDate == null);
 
             if (!isBookAvailable)
-            {
-                ModelState.AddModelError("BookId", "This book is currently borrowed");
-            }
+                ModelState.AddModelError("BookId", "Ta książka jest już wypożyczona.");
 
-            // Wyłącz walidację dla właściwości nawigacyjnych
             ModelState.Remove("Book");
             ModelState.Remove("Patron");
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Add(borrow);
-                    await _context.SaveChangesAsync();
-                    Console.WriteLine($"Borrow saved with ID: {borrow.Id}");
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error saving borrow: {ex.Message}");
-                    ModelState.AddModelError("", "Error saving borrow. Please try again.");
-                }
-            }
-            else
-            {
-                // Pokaż błędy walidacji
-                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    Console.WriteLine($"Validation error: {error.ErrorMessage}");
-                }
+                _context.Add(borrow);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
 
-            // Załaduj dane ponownie dla widoku
-            ViewBag.Books = await _context.Books
-                .Include(b => b.Author)
-                .ToListAsync();
-            ViewBag.Patrons = await _context.Patrons.ToListAsync();
-            ViewBag.DueDate = DateTime.Now.AddDays(14).ToString("yyyy-MM-dd");
+            // W razie błędu przeładuj listy
+            ViewBag.Books = await _context.Books.Include(b => b.Author).ToListAsync();
+            ViewBag.Patrons = User.IsInRole("Administrator")
+                ? await _context.Patrons.ToListAsync()
+                : await _context.Patrons.Where(p => p.Email == User.Identity.Name).ToListAsync();
 
             return View(borrow);
         }
 
         // GET: Borrows/Return/5
+        [Authorize(Roles = "Administrator")] // TYLKO ADMIN MOŻE ZROBIĆ ZWROT
         public async Task<IActionResult> Return(int id)
         {
             var borrow = await _context.Borrows
@@ -129,10 +115,7 @@ namespace LibraryManagement.Controllers
                 .Include(b => b.Patron)
                 .FirstOrDefaultAsync(b => b.Id == id);
 
-            if (borrow == null || borrow.ReturnDate != null)
-            {
-                return NotFound();
-            }
+            if (borrow == null || borrow.ReturnDate != null) return NotFound();
 
             return View(borrow);
         }
@@ -140,6 +123,7 @@ namespace LibraryManagement.Controllers
         // POST: Borrows/Return/5
         [HttpPost, ActionName("Return")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")] // TYLKO ADMIN MOŻE POTWIERDZIĆ
         public async Task<IActionResult> ReturnConfirmed(int id)
         {
             var borrow = await _context.Borrows.FindAsync(id);
