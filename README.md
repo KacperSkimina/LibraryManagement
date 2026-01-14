@@ -32,5 +32,6 @@ Aplikacja posiada wbudowany mechanizm **Seed Data** w pliku `Program.cs`. Przy p
 
 1.  Upewnij się, że masz zainstalowane **.NET 8 SDK**.
 2.  Sklonuj repozytorium: `git clone [link-do-twojego-repo]`
-3.  W folderze projektu wykonaj: `dotnet run`
-4.  Otwórz przeglądarkę pod adresem: `https://localhost:5001` (lub wskazanym w konsoli).
+3. W Visual Studio i w Konsoli Menedżera Pakietów wykonaj komendę, aby zainicjować bazę danych: Update-Database
+4.  W folderze projektu wykonaj: `dotnet run`
+5.  Otwórz przeglądarkę pod adresem: `https://localhost:5001` (lub wskazanym w konsoli).

@@ -60,6 +60,7 @@
                 <td>
                     @if (!borrow.IsReturned)
                     // Przycisk "Zwróć" pojawia się tylko, jeśli książka jest jeszcze u czytelnika
+                           @if (User.IsInRole("Administrator"))
                     {
                         <a asp-action="Return" asp-route-id="@borrow.Id" class="btn btn-sm btn-info">Zwróć</a>
                     }
